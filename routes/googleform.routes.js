@@ -95,6 +95,7 @@ module.exports = (app) => {
       })
       i=i+1;
     }
+    res.json({success: true})
   })
     
 }

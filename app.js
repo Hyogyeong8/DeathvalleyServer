@@ -5,6 +5,9 @@ const port = process.env.PORT || 8000; // -- 처음에 할땐 3000이라고 하�
 //나중에 80포트를 써야 할 일이 옵니다.
 const app = express();
 
+var jwt = require("jsonwebtoken");
+var bcrypt = require("bcryptjs");
+
 app.use(express.json());
 app.use(express.urlencoded({
   extended: true
@@ -55,7 +58,7 @@ app.post("/image/get", async (req, res) => {
   });
 });
 
-app.get("/users/create", async (req, res) => {
+app.get("/users/createPractice", async (req, res) => {
 
   const userList = await User.create({
     firstName: "HG",
@@ -79,4 +82,48 @@ app.get("/formQuestion/all", async (req, res) =>{
 
   })
   res.json({formQuestions: formQuestions})
+})
+
+app.post("/users/create", async (req, res) => {
+  const data = req.body;
+  const user = await User.create({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    password: bcrypt.hashSync(data.password, 8)
+  })
+  res.json({success: true})
+})
+
+app.post("/users/login", async (req, res) => {
+  const data = req.body;
+  console.log(data);
+  const user = await User.findOne({where: { email: data.email }})
+
+  if(user){
+    console.log(user)
+    console.log("success!!")
+    var passwordIsValid = bcrypt.compareSync(
+      data.password, 
+      user.password
+    );
+    if(passwordIsValid){
+      var token = jwt.sign({id: user.id}, 'secret-key', {expiresIn: 86400});
+      res.json({
+        success: true,
+        jwtToken: token
+      })
+    } else {
+      res.json({
+        success: false,
+        reason: "wrong password"
+      })
+    }
+  } else {
+    console.log("There is not an owner of the email. ")
+    res.json({
+      success: false,
+      reason: "no email exists"
+    })
+  }
 })
