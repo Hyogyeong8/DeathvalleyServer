@@ -4,9 +4,34 @@ const port = process.env.PORT || 8000; // -- 처음에 할땐 3000이라고 하�
 //localhost:3000 으로 하시는 것을 추천
 //나중에 80포트를 써야 할 일이 옵니다.
 const app = express();
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+// const io = new Server(server);
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:3000"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+
+  socket.on('chat message', msg => {
+    console.log('message: ' + msg)
+    io.emit('chat message', msg)
+  })
+}); 
+
+server.listen(8000, () => {
+  console.log('listening on *:8000');
+});
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -19,7 +44,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended : true}));
 
-app.listen(port, () => console.log(`Server up and running on port ${port}.`));
+// app.listen(port, () => console.log(`Server up and running on port ${port}.`));
 
 // require('./routes/auth.routes')(app);
 require('./routes/googleform.routes')(app);
@@ -108,10 +133,10 @@ app.post("/users/login", async (req, res) => {
       user.password
     );
     if(passwordIsValid){
-      var token = jwt.sign({id: user.id}, 'secret-key', {expiresIn: 86400});
+      var token = jwt.sign({id: user.id}, config.secret, {expiresIn: 86400});
       res.json({
         success: true,
-        jwtToken: token
+        token: token
       })
     } else {
       res.json({
@@ -126,4 +151,39 @@ app.post("/users/login", async (req, res) => {
       reason: "no email exists"
     })
   }
+})
+
+app.post("/users/valid", async (req,res) => {
+  const token = req.headers['Authorization']
+
+  if(token===undefined){
+    console.log(token);
+    console.log(req.headers['Authorization']);
+    res.json({success: false})
+  } else {
+    token = token.split(" ")[1];
+      
+    const options = {
+      ignoreExpiration: true
+    }
+
+    const verifyPromise = () => new Promise(function(resolve, reject){
+      jwt.verify(token, config.secret, options, function(err, decoded){
+        if (err){
+          reject(err)
+          return 
+        }
+        resolve(decoded)
+      })
+    })
+
+    const decoded = await verifyPromise();
+    const userId = decoded.id;
+
+    res.json({
+      success: true,
+      userId: userId
+    })
+  }
+
 })
