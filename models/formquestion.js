@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class formQuestion extends Model {
     /**
@@ -11,20 +9,23 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      const GoogleForm = models.GoogleForm
-      GoogleForm.hasMany(formQuestion)
+      const GoogleForm = models.GoogleForm;
+      GoogleForm.hasMany(formQuestion);
       // formQuestion.belongsTo(GoogleForm)
     }
-  };
-  formQuestion.init({
-    formQuestionId: DataTypes.INTEGER,
-    googleFormId: DataTypes.INTEGER,
-    title: DataTypes.STRING,
-    desc: DataTypes.STRING,
-    qType: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'formQuestion',
-  });
+  }
+  formQuestion.init(
+    {
+      formQuestionId: DataTypes.INTEGER,
+      googleFormId: DataTypes.INTEGER,
+      title: DataTypes.STRING,
+      desc: DataTypes.STRING,
+      qType: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "formQuestion",
+    }
+  );
   return formQuestion;
 };

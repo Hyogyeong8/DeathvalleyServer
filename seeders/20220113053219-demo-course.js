@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -10,17 +10,21 @@ module.exports = {
      *   name: 'John Doe',
      *   isBetaMember: false
      * }], {});
-    */
-    await queryInterface.bulkInsert('GoogleForms', [{
-      title: "gogo",
-      desc: "11"
-    }, {
-      title: "gogo2",
-      desc: "22"
-    }, {
-      title: "gogo3",
-      desc: "33"
-    }])
+     */
+    await queryInterface.bulkInsert("GoogleForms", [
+      {
+        title: "gogo",
+        desc: "11",
+      },
+      {
+        title: "gogo2",
+        desc: "22",
+      },
+      {
+        title: "gogo3",
+        desc: "33",
+      },
+    ]);
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -30,6 +34,6 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    return queryInterface.bulkDelete('GoogleForms', null, {});
-  }
+    return queryInterface.bulkDelete("GoogleForms", null, {});
+  },
 };

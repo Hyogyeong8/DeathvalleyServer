@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const { sequelize } = require("../models");
 
@@ -10,7 +10,9 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn('formQuestions', 'googleFormId', {type: Sequelize.INTEGER});
+    await queryInterface.addColumn("formQuestions", "googleFormId", {
+      type: Sequelize.INTEGER,
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -20,5 +22,5 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-  }
+  },
 };
